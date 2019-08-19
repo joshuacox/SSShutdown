@@ -7,10 +7,10 @@ install_all: build/RRReboot build/SSShutdown build/UUUpdateAndShutdown build/Upd
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}"
 	@mkdir -p ${PREFIX}/SSShutdown
 	@cp -av lib ${PREFIX}/SSShutdown/
-	@install -v -m 0755 -o root -g root build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
-	@install -v -m 0755 -o root -g root build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
-	@install -v -m 0755 -o root -g root build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
-	@install -v -m 0755 -o root -g root build_tmp/UpdateOnly ${PREFIX_BIN}/UpdateOnly
+	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
+	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
+	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
+	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UpdateOnly ${PREFIX_BIN}/UpdateOnly
 
 build_tmp:
 	mkdir -p build_tmp
@@ -33,3 +33,6 @@ build/UpdateOnly: build_tmp
 
 clean:
 	@rm -Rfv build_tmp
+
+echo:
+	echo ${USER}
