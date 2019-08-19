@@ -1,2 +1,4 @@
 #!/bin/bash
-poweroff
+. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
+
+try_poweroff

@@ -5,7 +5,7 @@
 
 update_mirrorlist () {
   mirrorlist_file='/etc/pacman.d/mirrorlist'
-  reflector \
+  sudo reflector \
       --threads 100 \
       --verbose \
       --save "$mirrorlist_file" \
@@ -15,9 +15,9 @@ update_mirrorlist () {
 }
 
 update_pacman () {
-  pacman -Sy
-  powerpill -Su --noconfirm
-  touch "/root/.updated"
+  sudo pacman -Sy
+  sudo powerpill -Su --noconfirm
+  sudo touch "/root/.updated"
 }
 
 phile_czekr () {
@@ -43,4 +43,12 @@ use_reflector () {
 
 pacman_update () {
   phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_pacman
+}
+
+try_shutdown () {
+  sudo poweroff
+}
+
+try_reboot () {
+  sudo reboot 
 }
