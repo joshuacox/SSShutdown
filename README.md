@@ -1,0 +1,2 @@
+# SSShutdown
+Abstract shutdown
