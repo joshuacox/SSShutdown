@@ -1,0 +1,5 @@
+#!/bin/bash
+. lib/util.bash
+
+use_reflector
+time pacman_update
