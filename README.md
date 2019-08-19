@@ -2,6 +2,22 @@
 
 Abstract shutdown, reboot, and updating and shutdown, this is to get into good habits of never using poweroff or reboot in the terminal, as these commands will not be present on a remote machine you will presented with a command not found error when you type UUUpdateAndShutdown on a remote host
 
+### Installation
+
+If you have permissions to install files in `/usr/local` you can merely:
+
+`make install`
+
+Otherwise you might use sudo:
+
+`sudo make install`
+
+Or place it elsewhere:
+
+`PREFIX=/opt make -e install`
+
+Notice the use of the `-e` flag to get make to let environment variables pass thru.
+
 ### RRReboot
 
 unceremoniously reboots the machine

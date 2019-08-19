@@ -1,12 +1,12 @@
 PREFIX:=/usr/local
-PREFIX_BIN:=/usr/local/bin
+PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
 install_all: build/RRReboot build/SSShutdown build/UUUpdateAndShutdown build/UpdateOnly
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}"
-	@mkdir -p ${PREFIX}/SSShutdown
-	@cp -av lib ${PREFIX}/SSShutdown/
+	@mkdir -p ${PREFIX}/SSShutdown/lib
+	@install -v -m 0755 -o ${USER} -g ${USER} lib/util.bash ${PREFIX}/SSShutdown/lib/util.bash
 	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
 	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
 	@install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
@@ -33,6 +33,3 @@ build/UpdateOnly: build_tmp
 
 clean:
 	@rm -Rfv build_tmp
-
-echo:
-	echo ${USER}
