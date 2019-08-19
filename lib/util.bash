@@ -27,7 +27,7 @@ phile_czekr () {
   filename=$1
   file_age_thresh=$(date -d "now - $2 days" +%s)
   function_to_run=$3
-  file_age=$(date -r "$filename" +%s)
+  file_age=$(sudo date -r "$filename" +%s)
   
   # ...and then just use integer math:
   if (( file_age <= file_age_thresh )); then
