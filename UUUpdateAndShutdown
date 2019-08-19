@@ -4,4 +4,4 @@
 use_reflector
 pacman_update
 
-poweroff
+try_poweroff
