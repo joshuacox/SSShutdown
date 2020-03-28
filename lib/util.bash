@@ -28,7 +28,7 @@ phile_czekr () {
   file_age_thresh=$(date -d "now - $2 days" +%s)
   function_to_run=$3
   file_age=$(sudo date -r "$filename" +%s)
-  
+
   # ...and then just use integer math:
   if (( file_age <= file_age_thresh )); then
     $function_to_run
@@ -49,6 +49,10 @@ try_shutdown () {
   sudo poweroff
 }
 
+try_sleep () {
+  systemctl suspend
+}
+
 try_reboot () {
-  sudo reboot 
+  sudo reboot
 }
