@@ -1,7 +1,6 @@
 #!/bin/bash
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
-: ${DEBUG:=false}
 
 update_mirrorlist () {
   mirrorlist_file='/etc/pacman.d/mirrorlist'
@@ -12,6 +11,10 @@ update_mirrorlist () {
       --sort rate \
       --age 24 \
       --latest 100
+}
+
+clear_all_placeholders () {
+  sudo rm -f "/root/.updated"
 }
 
 update_pacman () {
@@ -55,4 +58,8 @@ try_sleep () {
 
 try_reboot () {
   sudo reboot
+}
+
+try_suspend () {
+  systemctl suspend
 }
