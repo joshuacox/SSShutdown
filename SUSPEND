@@ -1,4 +1,0 @@
-#!/bin/bash
-. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
-
-try_shutdown
