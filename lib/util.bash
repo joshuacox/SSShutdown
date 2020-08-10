@@ -1,6 +1,7 @@
 #!/bin/bash
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
+. /etc/os-release
 
 update_mirrorlist () {
   mirrorlist_file='/etc/pacman.d/mirrorlist'
@@ -15,12 +16,6 @@ update_mirrorlist () {
 
 clear_all_placeholders () {
   sudo rm -f "/root/.updated"
-}
-
-update_pacman () {
-  sudo pacman -Sy
-  sudo powerpill -Su --noconfirm
-  sudo touch "/root/.updated"
 }
 
 phile_czekr () {
@@ -44,8 +39,37 @@ use_reflector () {
   phile_czekr "/etc/pacman.d/mirrorlist" $MIRROR_UPDATE_INTERVAL update_mirrorlist
 }
 
+update_pacman () {
+  sudo pacman -Sy
+  if [[ -f /usr/bin/powerpill ]]; then
+    sudo powerpill -Su --noconfirm
+  else
+    sudo pacman -Su --noconfirm
+  fi
+  sudo touch "/root/.updated"
+}
+
 pacman_update () {
+  use_reflector
   phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_pacman
+}
+
+update_apt () {
+  apt-get update
+  apt-get upgrade -y
+  sudo touch "/root/.updated"
+}
+
+apt_update () {
+  phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_apt
+}
+
+try_update () {
+  if [[ $NAME == "Arch Linux" ]]; then
+    pacman_update
+  elif [[ $NAME == "Ubuntu" || $NAME == "Ubuntu" ]]; then
+    apt_update
+  fi
 }
 
 try_shutdown () {

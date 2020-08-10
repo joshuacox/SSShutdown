@@ -1,5 +1,4 @@
 #!/bin/bash
 . $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
 
-use_reflector
-time pacman_update
+time try_update

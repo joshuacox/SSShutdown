@@ -2,7 +2,6 @@
 . $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
 
 clear_all_placeholders
-use_reflector
-pacman_update
+try_update
 
 try_shutdown
