@@ -2,6 +2,9 @@
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
 . /etc/os-release
+if [[ $DEBUG == true ]]; then
+  set -eux
+fi
 
 update_mirrorlist () {
   mirrorlist_file='/etc/pacman.d/mirrorlist'
