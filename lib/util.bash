@@ -58,8 +58,8 @@ pacman_update () {
 }
 
 update_apt () {
-  apt-get update
-  apt-get upgrade -y
+  sudo apt-get update
+  sudo apt-get upgrade -y
   sudo touch "/root/.updated"
 }
 
