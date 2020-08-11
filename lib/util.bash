@@ -3,7 +3,7 @@
 : ${SYSTEM_UPDATE_INTERVAL:=1}
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
-  set -eux
+  set -x
 fi
 
 update_mirrorlist () {
