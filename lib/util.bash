@@ -70,7 +70,7 @@ apt_update () {
 try_update () {
   if [[ $NAME == "Arch Linux" ]]; then
     pacman_update
-  elif [[ $NAME == "Ubuntu" || $NAME == "Ubuntu" ]]; then
+  elif [[ $NAME == "Ubuntu" || $NAME == "Debian" || $NAME == "Linux Mint" ]]; then
     apt_update
   fi
 }
