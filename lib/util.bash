@@ -61,6 +61,7 @@ update_pacman () {
 
 pacman_update () {
   use_reflector
+  phile_czekr "/root/.clearedcache" $SYSTEM_CLEARCACHE_INTERVAL pacman_clear_cache
   phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_pacman
 }
 
@@ -71,7 +72,6 @@ update_apt () {
 }
 
 apt_update () {
-  phile_czekr "/root/.clearedcache" $SYSTEM_CLEARCACHE_INTERVAL pacman_clear_cache
   phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_apt
 }
 
