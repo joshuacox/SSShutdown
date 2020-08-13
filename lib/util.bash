@@ -1,10 +1,17 @@
 #!/bin/bash
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
+: ${SYSTEM_CLEARCACHE_INTERVAL:=30}
+
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
   set -x
 fi
+
+pacman_clear_cache () {
+  yes Y|sudo pacman -Scc
+  sudo touch "/root/.clearedcache"
+}
 
 update_mirrorlist () {
   mirrorlist_file='/etc/pacman.d/mirrorlist'
@@ -64,6 +71,7 @@ update_apt () {
 }
 
 apt_update () {
+  phile_czekr "/root/.clearedcache" $SYSTEM_CLEARCACHE_INTERVAL pacman_clear_cache
   phile_czekr "/root/.updated" $SYSTEM_UPDATE_INTERVAL update_apt
 }
 
