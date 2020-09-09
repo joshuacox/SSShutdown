@@ -1,0 +1,10 @@
+#!/bin/sh
+TMP_DIR=$(mktemp -d --suffix='.SSShutdown')
+
+cd $TMP_DIR
+git clone https://github.com/joshuacox/SSShutdown.git
+cd SSShutdown
+git pull
+sudo make install
+cd
+rm -Rf $TMP_DIR
