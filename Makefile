@@ -50,3 +50,6 @@ build/UpdateOnly: build_tmp
 
 clean:
 	@rm -Rfv build_tmp
+
+vanity:
+	curl -i https://git.io -F "url=https://raw.githubusercontent.com/joshuacox/SSShutdown/master/bootstrap" -F "code=ssshutdown"

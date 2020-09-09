@@ -39,3 +39,11 @@ Or place it elsewhere:
 `PREFIX=/opt make -e install`
 
 Notice the use of the `-e` flag to get make to let environment variables pass thru.
+
+### oneliner
+
+Trust me?
+
+```
+curl -sL https://git.io/ssshutdown | bash
+```
