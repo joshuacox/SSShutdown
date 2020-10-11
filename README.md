@@ -47,3 +47,25 @@ Trust me?
 ```
 curl -sL https://git.io/ssshutdown | bash
 ```
+
+### Hooks
+
+If you need to do something before/after pacman/powerpill is called you can make two different files:
+
+For the in:
+
+```
+/etc/ssshutdown/hooks/in
+```
+
+For the out:
+
+```
+/etc/ssshutdown/hooks/out
+```
+
+And to setup two examples using the Makefiles:
+
+```
+sudo make hooks
+```

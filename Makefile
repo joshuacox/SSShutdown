@@ -53,3 +53,8 @@ clean:
 
 vanity:
 	curl -i https://git.io -F "url=https://raw.githubusercontent.com/joshuacox/SSShutdown/master/bootstrap" -F "code=ssshutdown"
+
+hooks:
+	sudo mkdir -p /etc/ssshutdown/hooks
+	sudo cp -i hooks.example/in.example /etc/ssshutdown/hooks/in
+	sudo cp -i hooks.example/out.example /etc/ssshutdown/hooks/out
