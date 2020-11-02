@@ -17,14 +17,15 @@ pacman_clear_cache () {
 }
 
 update_mirrorlist () {
-  mirrorlist_file="$MIRROR_LIST_LOCATION"
   sudo reflector \
-      --threads 100 \
       --verbose \
       --protocol https \
-      --save "$mirrorlist_file" \
+      --save "$MIRROR_LIST_LOCATION" \
       --sort rate \
       --age 24 \
+      --threads 100 \
+      --score 100 \
+      --fastest 100
       --latest 100
 }
 
