@@ -21,6 +21,7 @@ update_mirrorlist () {
   sudo reflector \
       --threads 100 \
       --verbose \
+      --protocol https \
       --save "$mirrorlist_file" \
       --sort rate \
       --age 24 \
