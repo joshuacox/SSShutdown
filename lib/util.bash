@@ -4,7 +4,8 @@
 : ${SYSTEM_CLEARCACHE_INTERVAL:=30}
 : ${CLEARED_CACHE_MARKER:="/var/cache/pacman/.clearedcache"}
 : ${ROOT_UPDATED_MARKER:="/root/.updated"}
-: ${MIRROR_LIST_LOCATION:="/etc/pacman.d/mirrorlist"}
+#: ${MIRROR_LIST_LOCATION:="/etc/pacman.d/mirrorlist"}
+: ${MIRROR_LIST_LOCATION:="/var/cache/pacman/mirrorlist"}
 
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
@@ -17,11 +18,10 @@ pacman_clear_cache () {
 }
 
 update_mirrorlist () {
-  mirrorlist_file="$MIRROR_LIST_LOCATION"
   sudo reflector \
       --threads 100 \
       --verbose \
-      --save "$mirrorlist_file" \
+      --save "$MIRROR_LIST_LOCATION" \
       --sort rate \
       --age 24 \
       --latest 100
@@ -49,7 +49,12 @@ phile_czekr () {
 }
 
 use_reflector () {
+  if [[ ! -f $MIRROR_LIST_LOCATION ]]
+    echo 'mirrorlist cache not found, using existing one to populate cache'
+    rsync -av /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
+  fi
   phile_czekr "$MIRROR_LIST_LOCATION" $MIRROR_UPDATE_INTERVAL update_mirrorlist
+  rsync -av "$MIRROR_LIST_LOCATION" /etc/pacman.d/mirrorlist
 }
 
 update_pacman () {
@@ -77,8 +82,8 @@ check_outhooks () {
 }
 
 pacman_update () {
-  use_reflector
   check_hooks
+  use_reflector
   phile_czekr "$CLEARED_CACHE_MARKER" "$SYSTEM_CLEARCACHE_INTERVAL" pacman_clear_cache
   phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_pacman
   check_outhooks
