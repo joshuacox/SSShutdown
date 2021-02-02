@@ -22,8 +22,11 @@ update_mirrorlist () {
       --threads 100 \
       --verbose \
       --save "$MIRROR_LIST_LOCATION" \
+      --protocol https \
       --sort rate \
       --age 24 \
+      --score 100 \
+      --fastest 100 \
       --latest 100
 }
 
