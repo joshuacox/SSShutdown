@@ -49,12 +49,19 @@ phile_czekr () {
 }
 
 use_reflector () {
-  if [[ ! -f $MIRROR_LIST_LOCATION ]]
-    echo 'mirrorlist cache not found, using existing one to populate cache'
-    rsync -av /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
+  if [[ ! -f $MIRROR_LIST_LOCATION ]]; then
+    echo 'Mirrorlist cache not found'
+    echo 'Using existing one to populate cache'
+    cp -v /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
   fi
   phile_czekr "$MIRROR_LIST_LOCATION" $MIRROR_UPDATE_INTERVAL update_mirrorlist
-  rsync -av "$MIRROR_LIST_LOCATION" /etc/pacman.d/mirrorlist
+  if ! cmp "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
+  then
+    #TMP=$(mktemp -d)
+    #sudo rsync --temp-dir /tmp/$TMP -av "$MIRROR_LIST_LOCATION" /etc/pacman.d/mirrorlist
+    #rm -Rf $TMP
+    sudo cp -v "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist"
+  fi
 }
 
 update_pacman () {
