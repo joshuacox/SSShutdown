@@ -13,7 +13,11 @@ if [[ $DEBUG == true ]]; then
 fi
 
 pacman_clear_cache () {
-  yes Y|sudo pacman -Scc
+  if [[ -x /usr/bin/paccache ]]; then 
+    paccache -rk1
+  else
+    yes Y|sudo pacman -Scc
+  fi
   sudo touch "$CLEARED_CACHE_MARKER"
 }
 
