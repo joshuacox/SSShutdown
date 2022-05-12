@@ -1,5 +1,9 @@
 #!/bin/bash
 . $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
 
-clear_update_placeholder
-try_update
+main () {
+  clear_update_placeholder
+  try_update
+}
+
+time main
