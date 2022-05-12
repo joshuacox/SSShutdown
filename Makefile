@@ -3,13 +3,14 @@ PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-install_all: build/RRReboot build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly
+install_all: build/RRReboot build/MorningUpdate build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
 	mkdir -p ${PREFIX}/SSShutdown/lib
 	install -v -m 0755 -o ${USER} -g ${USER} lib/util.bash ${PREFIX}/SSShutdown/lib/util.bash
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/sssuspend ${PREFIX_BIN}/sssuspend
+	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/MorningUpdate ${PREFIX_BIN}/MorningUpdate
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/FFForceUpdateAndShutdown ${PREFIX_BIN}/FFForceUpdateAndShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UpdateOnly ${PREFIX_BIN}/UpdateOnly
@@ -22,6 +23,11 @@ build/RRReboot: build_tmp
 	REPLACE_PREFIX_REPLACE=${PREFIX} \
 	envsubst < RRReboot > build_tmp/RRReboot
 	@echo 'made RRREboot'
+
+build/MorningUpdate: build_tmp
+	@REPLACE_PREFIX_REPLACE=${PREFIX} \
+	envsubst < MorningUpdate > build_tmp/MorningUpdate
+	@echo 'made MorningUpdate'
 
 build/sssuspend: build_tmp
 	@REPLACE_PREFIX_REPLACE=${PREFIX} \

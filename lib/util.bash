@@ -34,7 +34,7 @@ update_mirrorlist () {
       --latest 100
 }
 
-clear_all_placeholders () {
+clear_update_placeholder () {
   sudo rm -f "$ROOT_UPDATED_MARKER"
 }
 
