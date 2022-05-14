@@ -12,6 +12,10 @@ unceremoniously reboots the machine
 
 unceremoniously shuts down the machine
 
+### MorningUpdate
+
+unceremoniously updates the machine
+
 ### UpdateAndShutdown
 
 ceremoniously updates the machine and then shuts down the machine
@@ -26,6 +30,16 @@ ceremoniously updates the machine
 
 ## Installation
 
+### oneliner automated install
+
+Trust me?
+
+```
+curl -sL https://git.io/ssshutdown | bash
+```
+
+### makefile installation
+
 If you have permissions to install files in `/usr/local` you can merely:
 
 `make install`
@@ -39,14 +53,6 @@ Or place it elsewhere:
 `PREFIX=/opt make -e install`
 
 Notice the use of the `-e` flag to get make to let environment variables pass thru.
-
-### oneliner
-
-Trust me?
-
-```
-curl -sL https://git.io/ssshutdown | bash
-```
 
 ### Hooks
 
@@ -69,3 +75,5 @@ And to setup two examples using the Makefiles:
 ```
 sudo make hooks
 ```
+
+For example, I use these to mount /var/cache/pacman from NFS.
