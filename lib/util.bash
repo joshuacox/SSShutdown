@@ -72,7 +72,7 @@ use_reflector () {
 }
 
 update_pacman () {
-  sudo pacman -Sy
+  sudo pacman -Sy --noconfirm archlinux-keyring
   if [[ -f /usr/bin/powerpill ]]; then
     sudo powerpill -Su --noconfirm
   else
