@@ -6,6 +6,7 @@
 : ${ROOT_UPDATED_MARKER:="/root/.updated"}
 #: ${MIRROR_LIST_LOCATION:="/etc/pacman.d/mirrorlist"}
 : ${MIRROR_LIST_LOCATION:="/var/cache/pacman/mirrorlist"}
+: ${ONE_RING_TO_RULE_THEM_ALL:="archlinux-keyring gnome-keyring alpine-keyring debian-archive-keyring ubuntu-keyring"}
 
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
@@ -72,7 +73,7 @@ use_reflector () {
 }
 
 update_pacman () {
-  sudo pacman -Sy --noconfirm archlinux-keyring
+  sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
   if [[ -f /usr/bin/powerpill ]]; then
     sudo powerpill -Su --noconfirm
   else
