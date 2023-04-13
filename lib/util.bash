@@ -76,14 +76,16 @@ use_reflector () {
 loop_update_pacman () {
   looper=1
   returnCode=1
-  while [[ $looper != 0 ]]; do
+  while [[ $looper -le 10 ]]; do
     sudo ls -alh "$ROOT_UPDATED_MARKER"
     returnCode=$?
-    if [[ $returnCode != 0 ]]; then
-      update_pacman_core
-    else
-      looper=0
+    if [[ $returnCode == 0 ]]; then
+      # update marker found break loop
+      looper=11
       break
+    else
+      ((++looper))
+      update_pacman_core
     fi
   done
 }
