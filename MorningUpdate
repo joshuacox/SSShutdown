@@ -3,7 +3,8 @@
 
 main () {
   clear_update_placeholder
-  try_update
+  #try_update
+  loop_update_pacman
 }
 
 time main

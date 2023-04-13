@@ -7,6 +7,7 @@
 #: ${MIRROR_LIST_LOCATION:="/etc/pacman.d/mirrorlist"}
 : ${MIRROR_LIST_LOCATION:="/var/cache/pacman/mirrorlist"}
 : ${ONE_RING_TO_RULE_THEM_ALL:="archlinux-keyring gnome-keyring alpine-keyring debian-archive-keyring ubuntu-keyring"}
+: ${PACMAN_LOOPER:=false}
 
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
@@ -72,14 +73,42 @@ use_reflector () {
   fi
 }
 
+loop_update_pacman () {
+  looper=1
+  returnCode=1
+  while [[ $looper != 0 ]]; do
+    sudo ls -alh "$ROOT_UPDATED_MARKER"
+    returnCode=$?
+    if [[ $returnCode != 0 ]]; then
+      update_pacman_core
+    else
+      looper=0
+      break
+    fi
+  done
+}
+
 update_pacman () {
+  if [[ $PACMAN_LOOPER ]]; then
+    loop_update_pacman
+  else
+    update_pacman_core
+  fi
+}
+
+update_pacman_core () {
   sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
+  returnCode=1
   if [[ -f /usr/bin/powerpill ]]; then
     sudo powerpill -Su --noconfirm
+    returnCode=$?
   else
     sudo pacman -Su --noconfirm
+    returnCode=$?
   fi
-  sudo touch "$ROOT_UPDATED_MARKER"
+  if [[ $returnCode == 0 ]]; then
+    sudo touch "$ROOT_UPDATED_MARKER"
+  fi
 }
 
 check_hooks () {
