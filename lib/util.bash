@@ -80,10 +80,11 @@ loop_update_pacman () {
     sudo ls -alh "$ROOT_UPDATED_MARKER"
     returnCode=$?
     if [[ $returnCode == 0 ]]; then
-      # update marker found break loop
+      echo "# BREAK! update marker found, breaking looper at $looper loops"
       looper=11
       break
     else
+      echo "### update marker not found, at $looper loops"
       ((++looper))
       update_pacman_core
     fi
