@@ -7,7 +7,7 @@
 #: ${MIRROR_LIST_LOCATION:="/etc/pacman.d/mirrorlist"}
 : ${MIRROR_LIST_LOCATION:="/var/cache/pacman/mirrorlist"}
 : ${ONE_RING_TO_RULE_THEM_ALL:="archlinux-keyring gnome-keyring alpine-keyring debian-archive-keyring ubuntu-keyring"}
-: ${PACMAN_LOOPER:=false}
+: ${PACMAN_LOOPER:=true}
 
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
