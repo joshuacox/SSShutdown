@@ -74,7 +74,7 @@ use_reflector () {
 }
 
 loop_update_pacman () {
-  looper=1
+  looper=0
   returnCode=1
   while [[ $looper -le 10 ]]; do
     sudo ls -alh "$ROOT_UPDATED_MARKER"
