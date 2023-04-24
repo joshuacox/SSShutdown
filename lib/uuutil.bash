@@ -92,6 +92,12 @@ loop_update_pacman () {
 }
 
 update_pacman () {
+  if [[ -f /var/cache/pacman/pkg/cache.lck ]]; then
+    echo The pacman cache file exists!
+    echo Check to see if other pacman processes are running.
+    echo If not `rm /var/cache/pacman/pkg/cache.lck` to clear this file.
+    exit 1
+  fi
   if [[ $PACMAN_LOOPER ]]; then
     loop_update_pacman
   else
