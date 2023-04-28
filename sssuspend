@@ -1,4 +1,4 @@
 #!/bin/bash
-. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/util.bash
+. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
 
 try_sleep
