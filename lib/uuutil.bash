@@ -8,6 +8,7 @@
 : ${MIRROR_LIST_LOCATION:="/var/cache/pacman/mirrorlist"}
 : ${ONE_RING_TO_RULE_THEM_ALL:="archlinux-keyring gnome-keyring alpine-keyring debian-archive-keyring ubuntu-keyring"}
 : ${PACMAN_LOOPER:=true}
+: ${USE_POWERPILL:=false}
 
 . /etc/os-release
 if [[ $DEBUG == true ]]; then
@@ -108,7 +109,7 @@ update_pacman () {
 update_pacman_core () {
   sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
   returnCode=1
-  if [[ -f /usr/bin/powerpill ]]; then
+  if [[ -f /usr/bin/powerpill && USE_POWERPILL == true ]]; then
     sudo powerpill -Su --noconfirm
     returnCode=$?
   else
