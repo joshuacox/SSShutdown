@@ -107,17 +107,19 @@ update_pacman () {
 }
 
 update_pacman_core () {
-  sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
   returnCode=1
   if [[ -f /usr/bin/powerpill && USE_POWERPILL == true ]]; then
+    sudo pacman -Sy --noconfirm
     sudo powerpill -Su --noconfirm
     returnCode=$?
   else
-    sudo pacman -Su --noconfirm
+    sudo pacman -Syu --noconfirm
     returnCode=$?
   fi
   if [[ $returnCode == 0 ]]; then
     sudo touch "$ROOT_UPDATED_MARKER"
+  else
+    sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
   fi
 }
 
