@@ -1,0 +1,8 @@
+#!/bin/bash
+. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
+
+main () {
+  update_mirrorlist
+}
+
+time main
