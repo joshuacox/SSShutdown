@@ -3,13 +3,14 @@ PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-install_all: build/RRReboot build/MorningUpdate build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly
+install_all: build/RRReboot build/MorningUpdate build/mmmirrorUpdater build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
 	mkdir -p ${PREFIX}/SSShutdown/lib
 	install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/sssuspend ${PREFIX_BIN}/sssuspend
+	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/mmmirrorUpdater ${PREFIX_BIN}/mmmirrorUpdater
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/MorningUpdate ${PREFIX_BIN}/MorningUpdate
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/FFForceUpdateAndShutdown ${PREFIX_BIN}/FFForceUpdateAndShutdown
@@ -28,6 +29,11 @@ build/MorningUpdate: build_tmp
 	@REPLACE_PREFIX_REPLACE=${PREFIX} \
 	envsubst < MorningUpdate > build_tmp/MorningUpdate
 	@echo 'made MorningUpdate'
+
+build/mmmirrorUpdater: build_tmp
+	@REPLACE_PREFIX_REPLACE=${PREFIX} \
+	envsubst < mmmirrorUpdater > build_tmp/mmmirrorUpdater
+	@echo 'made mmmirrorUpdater'
 
 build/sssuspend: build_tmp
 	@REPLACE_PREFIX_REPLACE=${PREFIX} \
