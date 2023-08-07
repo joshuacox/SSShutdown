@@ -3,7 +3,7 @@ PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-install_all: build/RRReboot build/MorningUpdate build/mmmirrorUpdater build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly
+install_all: build/RRReboot build/MorningUpdate build/mmmirrorUpdater build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly build/hibernate build/hybrid
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
 	mkdir -p ${PREFIX}/SSShutdown/lib
 	install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
@@ -15,6 +15,8 @@ install_all: build/RRReboot build/MorningUpdate build/mmmirrorUpdater build/sssu
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/FFForceUpdateAndShutdown ${PREFIX_BIN}/FFForceUpdateAndShutdown
 	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UpdateOnly ${PREFIX_BIN}/UpdateOnly
+	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/hibernate ${PREFIX_BIN}/hibernate
+	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/hybrid ${PREFIX_BIN}/hybrid
 
 build_tmp:
 	@echo 'making build_tmp'
@@ -59,6 +61,16 @@ build/UpdateOnly: build_tmp
 	@REPLACE_PREFIX_REPLACE=${PREFIX} \
 	envsubst < UpdateOnly > build_tmp/UpdateOnly
 	@echo 'made UpdateOnly'
+
+build/hibernate: build_tmp
+	REPLACE_PREFIX_REPLACE=${PREFIX} \
+	envsubst < hibernate > build_tmp/hibernate
+	@echo 'made hibernate'
+
+build/hybrid: build_tmp
+	REPLACE_PREFIX_REPLACE=${PREFIX} \
+	envsubst < hybrid > build_tmp/hybrid
+	@echo 'made hyrbid'
 
 clean:
 	@rm -Rfv build_tmp
