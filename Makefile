@@ -3,74 +3,12 @@ PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-install_all: build/RRReboot build/MorningUpdate build/mmmirrorUpdater build/sssuspend build/SSShutdown build/FFForceUpdateAndShutdown build/UUUpdateAndShutdown build/UpdateOnly build/hibernate build/hybrid
+INSTALLS = RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hibernate hybrid PowerSave Low Mid Performance
+install_all:
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
-	mkdir -p ${PREFIX}/SSShutdown/lib
-	install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/SSShutdown ${PREFIX_BIN}/SSShutdown
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/sssuspend ${PREFIX_BIN}/sssuspend
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/mmmirrorUpdater ${PREFIX_BIN}/mmmirrorUpdater
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/MorningUpdate ${PREFIX_BIN}/MorningUpdate
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UUUpdateAndShutdown ${PREFIX_BIN}/UUUpdateAndShutdown
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/FFForceUpdateAndShutdown ${PREFIX_BIN}/FFForceUpdateAndShutdown
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/UpdateOnly ${PREFIX_BIN}/UpdateOnly
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/hibernate ${PREFIX_BIN}/hibernate
-	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/hybrid ${PREFIX_BIN}/hybrid
-
-build_tmp:
-	@echo 'making build_tmp'
-	mkdir -p build_tmp
-
-build/RRReboot: build_tmp
-	REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < RRReboot > build_tmp/RRReboot
-	@echo 'made RRREboot'
-
-build/MorningUpdate: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < MorningUpdate > build_tmp/MorningUpdate
-	@echo 'made MorningUpdate'
-
-build/mmmirrorUpdater: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < mmmirrorUpdater > build_tmp/mmmirrorUpdater
-	@echo 'made mmmirrorUpdater'
-
-build/sssuspend: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < sssuspend > build_tmp/sssuspend
-	@echo 'made sssuspend'
-
-build/SSShutdown: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < SSShutdown > build_tmp/SSShutdown
-	@echo 'made SSShutdown'
-
-build/UUUpdateAndShutdown: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < UUUpdateAndShutdown > build_tmp/UUUpdateAndShutdown
-	@echo 'made UUUpdateAndShutdown'
-
-build/FFForceUpdateAndShutdown: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < FFForceUpdateAndShutdown > build_tmp/FFForceUpdateAndShutdown
-	@echo 'made FFForceUpdateAndShutdown'
-
-build/UpdateOnly: build_tmp
-	@REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < UpdateOnly > build_tmp/UpdateOnly
-	@echo 'made UpdateOnly'
-
-build/hibernate: build_tmp
-	REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < hibernate > build_tmp/hibernate
-	@echo 'made hibernate'
-
-build/hybrid: build_tmp
-	REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < hybrid > build_tmp/hybrid
-	@echo 'made hyrbid'
+	$(foreach var,$(INSTALLS),./installer $(var);)
+	sudo mkdir -p ${PREFIX}/SSShutdown/lib
+	sudo install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
 
 clean:
 	@rm -Rfv build_tmp

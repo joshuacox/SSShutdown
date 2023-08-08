@@ -1,3 +1,4 @@
 #!/bin/sh
+. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
 
-systemctl hybrid-sleep
+try_hybrid

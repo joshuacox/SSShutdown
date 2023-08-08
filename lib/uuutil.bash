@@ -178,3 +178,47 @@ try_reboot () {
 try_suspend () {
   systemctl suspend
 }
+
+try_hibernate () {
+  swapon_count=$(swapon|wc -l)
+  if [[ $swapon_count > 1 ]]; then
+    systemctl hibernate
+  else
+    echo 'No swap cannot hibernate!'; exit 1
+  fi
+}
+
+try_hybrid () {
+  systemctl hybrid-sleep
+}
+
+command_exists () {
+  type "$1" &> /dev/null ;
+}
+
+powertop_auto_tune () {
+  if command_exists powertop; then
+    sudo powertop --auto-tune
+  fi
+}
+
+cpufreqqr () {
+  THIS_GOVERNOR=$1
+  THIS_MAXFREQ=$2
+  THIS_MINFREQ=$3
+  if command_exists cpupower; then
+    sudo cpupower frequency-set --min $MINFREQ --max $MAXFREQ --governor $GOVERNOR
+    sudo cpupower frequency-info
+  elif command_exists cpufreq-set; then
+    CPU_COUNT=$(lscpu -p | grep -E -v '^#' | sort -u -t, -k 2,4 | wc -l)
+    count_zero=0
+    while [[ $count_zero -lt $CPU_COUNT ]]; do
+      ((++count_zero))
+      sudo cpufreq-set -c $count_zero -g $GORVERNOR --max $MAXFREQ --min $MINFREQ
+      #sudo cpufreq-set -c $count_zero --max $MAXFREQ
+      #sudo cpufreq-set -c $count_zero --min $MINFREQ
+      #echo "cpu $i set to performance"
+    done
+    cpufreq-info
+  fi
+}
