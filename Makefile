@@ -3,7 +3,7 @@ PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-INSTALLS = RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hibernate hybrid PowerSave Low Mid Performance
+INSTALLS = RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hhhibernate hybrid PowerSave Low Mid Performance
 install_all:
 	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
 	$(foreach var,$(INSTALLS),./installer $(var);)

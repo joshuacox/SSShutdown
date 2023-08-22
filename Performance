@@ -2,6 +2,6 @@
 . $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
 MAXFREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq)
 MINFREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq)
-GOVERNOR=powersave
+GOVERNOR=performance
 
 cpufreqqr $GOVERNOR $MAXFREQ $MINFREQ

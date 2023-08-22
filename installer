@@ -1,7 +1,7 @@
 #!/bin/sh
 : ${PREFIX:=/usr/local}
 : ${PREFIX_BIN:=${PREFIX}/bin}
-install_all='RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hibernate hybrid'
+install_all='RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hhhibernate hybrid'
 install_all=$@
 TMP=$(mktemp -d)
 trap "rm -rf $TMP" EXIT
