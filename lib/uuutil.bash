@@ -26,14 +26,20 @@ pacman_clear_cache () {
 
 update_mirrorlist () {
   sudo reflector \
-      --threads 100 \
+      --threads 8 \
+      --delay 1 \
+      --country US \
+      --ipv4 \
       --verbose \
       --save "$MIRROR_LIST_LOCATION" \
-      --protocol https \
+      --protocol https,rsync \
       --sort rate \
+      --download-timeout 4 \
+      --connection-timeout 4 \
       --age 24 \
       --score 100 \
       --fastest 100 \
+      --number 100 \
       --latest 100
 }
 
@@ -58,13 +64,7 @@ phile_czekr () {
   fi
 }
 
-use_reflector () {
-  if [[ ! -f $MIRROR_LIST_LOCATION ]]; then
-    echo 'Mirrorlist cache not found'
-    echo 'Using existing one to populate cache'
-    cp -v /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
-  fi
-  phile_czekr "$MIRROR_LIST_LOCATION" $MIRROR_UPDATE_INTERVAL update_mirrorlist
+replace_mirrorlist () {
   if ! cmp "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
   then
     #TMP=$(mktemp -d)
@@ -72,6 +72,16 @@ use_reflector () {
     #rm -Rf $TMP
     sudo cp -v "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist"
   fi
+}
+
+use_reflector () {
+  if [[ ! -f $MIRROR_LIST_LOCATION ]]; then
+    echo 'Mirrorlist cache not found'
+    echo 'Using existing one to populate cache'
+    cp -v /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
+  fi
+  phile_czekr "$MIRROR_LIST_LOCATION" $MIRROR_UPDATE_INTERVAL update_mirrorlist
+  replace_mirrorlist
 }
 
 loop_update_pacman () {

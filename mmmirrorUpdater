@@ -3,6 +3,7 @@
 
 main () {
   update_mirrorlist
+  replace_mirrorlist
 }
 
 time main
