@@ -1,0 +1,11 @@
+#!/bin/sh
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+. $SCRIPTPATH/lib/uuutil.bash
+
+main () {
+  update_mirrorlist
+  replace_mirrorlist
+}
+
+time main

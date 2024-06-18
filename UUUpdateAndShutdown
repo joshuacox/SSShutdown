@@ -1,6 +1,0 @@
-#!/bin/bash
-. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
-
-try_update
-
-try_shutdown

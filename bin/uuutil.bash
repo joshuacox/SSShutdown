@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
 : ${SYSTEM_CLEARCACHE_INTERVAL:=30}
@@ -11,12 +11,13 @@
 : ${USE_POWERPILL:=false}
 
 . /etc/os-release
-if [[ $DEBUG == true ]]; then
+
+if [ "$DEBUG" = "true" ]; then
   set -x
 fi
 
 pacman_clear_cache () {
-  if [[ -x /usr/bin/paccache ]]; then 
+  if [ -x /usr/bin/paccache ]; then 
     paccache -rk1
   else
     yes Y|sudo pacman -Scc
@@ -48,7 +49,7 @@ clear_update_placeholder () {
 }
 
 phile_czekr () {
-  if [[ $DEBUG == true ]]; then
+  if [ "$DEBUG" = "true" ]; then
     printf "If $1 is older than $2 days then run the function $3\n"
   fi
   filename=$1
@@ -57,7 +58,7 @@ phile_czekr () {
   file_age=$(sudo date -r "$filename" +%s)
 
   # ...and then just use integer math:
-  if (( file_age <= file_age_thresh )); then
+  if [ $file_age -le $file_age_thresh ]; then
     $function_to_run
   else
     echo "$filename is up to date"
@@ -75,7 +76,7 @@ replace_mirrorlist () {
 }
 
 use_reflector () {
-  if [[ ! -f $MIRROR_LIST_LOCATION ]]; then
+  if [ ! -f $MIRROR_LIST_LOCATION ]; then
     echo 'Mirrorlist cache not found'
     echo 'Using existing one to populate cache'
     cp -v /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
@@ -87,29 +88,29 @@ use_reflector () {
 loop_update_pacman () {
   looper=0
   returnCode=1
-  while [[ $looper -le 10 ]]; do
+  while [ $looper -le 10 ]; do
     sudo ls -alh "$ROOT_UPDATED_MARKER"
     returnCode=$?
-    if [[ $returnCode == 0 ]]; then
+    if [ $returnCode == 0 ]; then
       echo "# BREAK! update marker found, breaking looper at $looper loops"
       looper=11
       break
     else
       echo "### update marker not found, at $looper loops"
-      ((++looper))
+      looper=$((looper+1))
       update_pacman_core
     fi
   done
 }
 
 update_pacman () {
-  if [[ -f /var/cache/pacman/pkg/cache.lck ]]; then
+  if [ -f /var/cache/pacman/pkg/cache.lck ]; then
     echo The pacman cache file exists!
     echo Check to see if other pacman processes are running.
     echo If not `rm /var/cache/pacman/pkg/cache.lck` to clear this file.
     exit 1
   fi
-  if [[ $PACMAN_LOOPER ]]; then
+  if [ $PACMAN_LOOPER ]; then
     loop_update_pacman
   else
     update_pacman_core
@@ -118,7 +119,7 @@ update_pacman () {
 
 update_pacman_core () {
   returnCode=1
-  if [[ -f /usr/bin/powerpill && USE_POWERPILL == true ]]; then
+  if [ -f /usr/bin/powerpill && USE_POWERPILL == true ]; then
     sudo pacman -Sy --noconfirm
     sudo powerpill -Su --noconfirm
     returnCode=$?
@@ -126,7 +127,7 @@ update_pacman_core () {
     sudo pacman -Syu --noconfirm
     returnCode=$?
   fi
-  if [[ $returnCode == 0 ]]; then
+  if [ $returnCode -eq 0 ]; then
     sudo touch "$ROOT_UPDATED_MARKER"
   else
     sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
@@ -134,14 +135,14 @@ update_pacman_core () {
 }
 
 check_hooks () {
-  if [[ -f /etc/ssshutdown/hooks/in ]]; then
+  if [ -f /etc/ssshutdown/hooks/in ]; then
     echo 'Found in hook'
     sudo bash /etc/ssshutdown/hooks/in
   fi
 }
 
 check_outhooks () {
-  if [[ -f /etc/ssshutdown/hooks/out ]]; then
+  if [ -f /etc/ssshutdown/hooks/out ]; then
     echo 'Found out hook'
     sudo bash /etc/ssshutdown/hooks/out
   fi
@@ -165,11 +166,29 @@ apt_update () {
   phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_apt
 }
 
+nix_update () {
+  phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_nix
+}
+
+update_nix () {
+  if command_exists nx; then
+    nx auto -f
+  else
+    echo nx is not installed
+    exit 1
+  fi
+}
+
 try_update () {
-  if [[ $NAME == "Arch Linux" ]]; then
+  if [ $NAME == "Arch Linux" ]; then
     pacman_update
-  elif [[ $NAME == "Ubuntu" || $NAME == "Debian" || $NAME == "Linux Mint" ]]; then
+  elif [ $NAME == "Ubuntu" || $NAME == "Debian" || $NAME == "Linux Mint" ]; then
     apt_update
+  elif [ $NAME == "NixOS" ]; then
+    nix_update
+  else
+    echo "unknown os = $NAME bailing out!"
+    exit 1
   fi
 }
 
@@ -191,7 +210,7 @@ try_suspend () {
 
 try_hibernate () {
   swapon_count=$(swapon|wc -l)
-  if [[ $swapon_count > 1 ]]; then
+  if [ $swapon_count -gt 1 ]; then
     systemctl hibernate
   else
     echo 'No swap cannot hibernate!'; exit 1
@@ -222,8 +241,8 @@ cpufreqqr () {
   elif command_exists cpufreq-set; then
     CPU_COUNT=$(lscpu -p | grep -E -v '^#' | sort -u -t, -k 2,4 | wc -l)
     count_zero=0
-    while [[ $count_zero -lt $CPU_COUNT ]]; do
-      ((++count_zero))
+    while [ $count_zero -lt $CPU_COUNT ]; do
+      count_zero=$((count_zero+1))
       sudo cpufreq-set -c $count_zero -g $GORVERNOR --max $MAXFREQ --min $MINFREQ
       #sudo cpufreq-set -c $count_zero --max $MAXFREQ
       #sudo cpufreq-set -c $count_zero --min $MINFREQ

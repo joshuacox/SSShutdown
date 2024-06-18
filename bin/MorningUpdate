@@ -1,0 +1,11 @@
+#!/bin/sh
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+. $SCRIPTPATH/lib/uuutil.bash
+
+main () {
+  clear_update_placeholder
+  try_update
+}
+
+time main

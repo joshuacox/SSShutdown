@@ -1,4 +1,0 @@
-#!/bin/sh
-. $REPLACE_PREFIX_REPLACE/SSShutdown/lib/uuutil.bash
-
-try_hybrid

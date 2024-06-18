@@ -1,14 +1,17 @@
-PREFIX:=/usr/local
+ifdef PREFIX
+	PREFIX := $(PREFIX)
+else
+  PREFIX:=/usr/local
+endif
 PREFIX_BIN:=${PREFIX}/bin
 
 install: install_all clean
 
-INSTALLS = RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hhhibernate hybrid PowerSave Low Mid Performance
 install_all:
-	@echo "Warning you will need the correct permission to put files in ${PREFIX}, or use sudo make install"
-	$(foreach var,$(INSTALLS),./installer $(var);)
-	sudo mkdir -p ${PREFIX}/SSShutdown/lib
-	sudo install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
+	./installer
+
+echo:
+	echo ${PREFIX}
 
 clean:
 	@rm -Rfv build_tmp

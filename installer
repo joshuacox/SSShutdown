@@ -1,26 +1,10 @@
 #!/bin/sh
+set -eux
+if [ -z $out ]; then
 : ${PREFIX:=/usr/local}
+else
+: ${PREFIX:=$out}
+fi
 : ${PREFIX_BIN:=${PREFIX}/bin}
-install_all='RRReboot MorningUpdate mmmirrorUpdater sssuspend SSShutdown FFForceUpdateAndShutdown UUUpdateAndShutdown UpdateOnly hhhibernate hybrid'
-install_all=$@
-TMP=$(mktemp -d)
-trap "rm -rf $TMP" EXIT
 
-installr () {
-  THIS_THING=$1
-  THIS_USER=$2
-  THIS_SRC=$TMP/$THIS_THING
-  THIS_DEST=$PREFIX_BIN/$THIS_THING
-#	install -v -m 0755 -o ${USER} -g ${USER} lib/uuutil.bash ${PREFIX}/SSShutdown/lib/uuutil.bash
-#	install -v -m 0755 -o ${USER} -g ${USER} build_tmp/RRReboot ${PREFIX_BIN}/RRReboot
-	REPLACE_PREFIX_REPLACE=${PREFIX} \
-	envsubst < $THIS_THING > $THIS_SRC
- 	sudo install -v -m 0755 -o ${THIS_USER} -g ${THIS_USER} ${THIS_SRC} ${THIS_DEST}
-}
-
-for i in $install_all
-do
-  #echo $i
-  installr $i $USER
-  #ls -alh $TMP/$i
-done
+cp -av bin ${PREFIX}/
