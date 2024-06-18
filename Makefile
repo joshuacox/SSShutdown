@@ -1,3 +1,4 @@
+
 ifdef PREFIX
 	PREFIX := $(PREFIX)
 else
@@ -5,13 +6,13 @@ else
 endif
 PREFIX_BIN:=${PREFIX}/bin
 
+echo:
+	echo ${PREFIX}
+
 install: install_all clean
 
 install_all:
 	./installer
-
-echo:
-	echo ${PREFIX}
 
 clean:
 	@rm -Rfv build_tmp

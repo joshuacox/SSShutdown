@@ -26,7 +26,7 @@
       stdenv.mkDerivation {
         name = "SSShutdown";
         src = self;
-        installPhase = "cp -av bin $out/";
+        installPhase = "mkdir -p $out && cp -av bin $out/";
       };
   };
 }
