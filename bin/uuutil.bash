@@ -55,7 +55,11 @@ phile_czekr () {
   filename=$1
   file_age_thresh=$(date -d "now - $2 days" +%s)
   function_to_run=$3
-  file_age=$(sudo date -r "$filename" +%s)
+  if [ -f $filename ]; then
+    file_age=$(sudo date -r "$filename" +%s)
+  else
+    file_age=$file_age_thresh
+  fi
 
   # ...and then just use integer math:
   if [ $file_age -le $file_age_thresh ]; then
@@ -91,7 +95,7 @@ loop_update_pacman () {
   while [ $looper -le 10 ]; do
     sudo ls -alh "$ROOT_UPDATED_MARKER"
     returnCode=$?
-    if [ $returnCode == 0 ]; then
+    if [ $returnCode = 0 ]; then
       echo "# BREAK! update marker found, breaking looper at $looper loops"
       looper=11
       break
@@ -119,10 +123,15 @@ update_pacman () {
 
 update_pacman_core () {
   returnCode=1
-  if [ -f /usr/bin/powerpill && USE_POWERPILL == true ]; then
+  if [ USE_POWERPILL = true ]; then
     sudo pacman -Sy --noconfirm
-    sudo powerpill -Su --noconfirm
-    returnCode=$?
+    if [ -f /usr/bin/powerpill ]; then
+      sudo powerpill -Su --noconfirm
+      returnCode=$?
+    else
+      echo 'Error power pill not found!'
+      exit 1
+    fi
   else
     sudo pacman -Syu --noconfirm
     returnCode=$?
@@ -180,11 +189,11 @@ update_nix () {
 }
 
 try_update () {
-  if [ $NAME == "Arch Linux" ]; then
+  if [ "${NAME}" = "Arch Linux" ]; then
     pacman_update
-  elif [ $NAME == "Ubuntu" || $NAME == "Debian" || $NAME == "Linux Mint" ]; then
+  elif [ "${NAME}" = "Ubuntu" || "${NAME}" = "Debian" || "${NAME}" = "Linux Mint" ]; then
     apt_update
-  elif [ $NAME == "NixOS" ]; then
+  elif [ "${NAME}" = "NixOS" ]; then
     nix_update
   else
     echo "unknown os = $NAME bailing out!"
