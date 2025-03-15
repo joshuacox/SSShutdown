@@ -9,10 +9,13 @@
 : ${ONE_RING_TO_RULE_THEM_ALL:="archlinux-keyring gnome-keyring alpine-keyring debian-archive-keyring ubuntu-keyring"}
 : ${PACMAN_LOOPER:=true}
 : ${USE_POWERPILL:=false}
+# rsync is 404ing on my machine so removing
+#: ${PROTOCOLS:="https,rsync"}
+: ${PROTOCOLS:="https"}
 
 . /etc/os-release
 
-if [ "$DEBUG" = "true" ]; then
+if [ "${DEBUG}" = "true" ]; then
   set -x
 fi
 
@@ -22,7 +25,7 @@ pacman_clear_cache () {
   else
     yes Y|sudo pacman -Scc
   fi
-  sudo touch "$CLEARED_CACHE_MARKER"
+  sudo touch "${CLEARED_CACHE_MARKER}"
 }
 
 update_mirrorlist () {
@@ -32,8 +35,8 @@ update_mirrorlist () {
       --country US \
       --ipv4 \
       --verbose \
-      --save "$MIRROR_LIST_LOCATION" \
-      --protocol https,rsync \
+      --save "${MIRROR_LIST_LOCATION}" \
+      --protocol "${PROTOCOLS}" \
       --sort rate \
       --download-timeout 4 \
       --connection-timeout 4 \
@@ -45,11 +48,11 @@ update_mirrorlist () {
 }
 
 clear_update_placeholder () {
-  sudo rm -f "$ROOT_UPDATED_MARKER"
+  sudo rm -f "${ROOT_UPDATED_MARKER}"
 }
 
 phile_czekr () {
-  if [ "$DEBUG" = "true" ]; then
+  if [ "${DEBUG}" = "true" ]; then
     printf "If $1 is older than $2 days then run the function $3\n"
   fi
   filename=$1
@@ -70,22 +73,22 @@ phile_czekr () {
 }
 
 replace_mirrorlist () {
-  if ! cmp "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
+  if ! cmp "${MIRROR_LIST_LOCATION}" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
   then
     #TMP=$(mktemp -d)
     #sudo rsync --temp-dir /tmp/$TMP -av "$MIRROR_LIST_LOCATION" /etc/pacman.d/mirrorlist
     #rm -Rf $TMP
-    sudo cp -v "$MIRROR_LIST_LOCATION" "/etc/pacman.d/mirrorlist"
+    sudo cp -v "${MIRROR_LIST_LOCATION}" "/etc/pacman.d/mirrorlist"
   fi
 }
 
 use_reflector () {
-  if [ ! -f $MIRROR_LIST_LOCATION ]; then
+  if [ ! -f ${MIRROR_LIST_LOCATION} ]; then
     echo 'Mirrorlist cache not found'
     echo 'Using existing one to populate cache'
-    cp -v /etc/pacman.d/mirrorlist "$MIRROR_LIST_LOCATION" 
+    cp -v /etc/pacman.d/mirrorlist "${MIRROR_LIST_LOCATION}" 
   fi
-  phile_czekr "$MIRROR_LIST_LOCATION" $MIRROR_UPDATE_INTERVAL update_mirrorlist
+  phile_czekr "${MIRROR_LIST_LOCATION}" ${MIRROR_UPDATE_INTERVAL} update_mirrorlist
   replace_mirrorlist
 }
 
@@ -93,7 +96,7 @@ loop_update_pacman () {
   looper=0
   returnCode=1
   while [ $looper -le 10 ]; do
-    sudo ls -alh "$ROOT_UPDATED_MARKER"
+    sudo ls -alh "${ROOT_UPDATED_MARKER}"
     returnCode=$?
     if [ $returnCode = 0 ]; then
       echo "# BREAK! update marker found, breaking looper at $looper loops"
@@ -114,7 +117,7 @@ update_pacman () {
     echo If not `rm /var/cache/pacman/pkg/cache.lck` to clear this file.
     exit 1
   fi
-  if [ $PACMAN_LOOPER ]; then
+  if [ ${PACMAN_LOOPER} ]; then
     loop_update_pacman
   else
     update_pacman_core
@@ -137,9 +140,9 @@ update_pacman_core () {
     returnCode=$?
   fi
   if [ $returnCode -eq 0 ]; then
-    sudo touch "$ROOT_UPDATED_MARKER"
+    sudo touch "${ROOT_UPDATED_MARKER}"
   else
-    sudo pacman -Sy --noconfirm $ONE_RING_TO_RULE_THEM_ALL
+    sudo pacman -Sy --noconfirm ${ONE_RING_TO_RULE_THEM_ALL}
   fi
 }
 
@@ -160,23 +163,23 @@ check_outhooks () {
 pacman_update () {
   check_hooks
   use_reflector
-  phile_czekr "$CLEARED_CACHE_MARKER" "$SYSTEM_CLEARCACHE_INTERVAL" pacman_clear_cache
-  phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_pacman
+  phile_czekr "${CLEARED_CACHE_MARKER}" "${SYSTEM_CLEARCACHE_INTERVAL}" pacman_clear_cache
+  phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_pacman
   check_outhooks
 }
 
 update_apt () {
   sudo apt-get update
   sudo apt-get upgrade -y
-  sudo touch "$ROOT_UPDATED_MARKER"
+  sudo touch "${ROOT_UPDATED_MARKER}"
 }
 
 apt_update () {
-  phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_apt
+  phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_apt
 }
 
 nix_update () {
-  phile_czekr "$ROOT_UPDATED_MARKER" "$SYSTEM_UPDATE_INTERVAL" update_nix
+  phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_nix
 }
 
 update_nix () {
@@ -196,7 +199,7 @@ try_update () {
   elif [ "${NAME}" = "NixOS" ]; then
     nix_update
   else
-    echo "unknown os = $NAME bailing out!"
+    echo "unknown os = ${NAME} bailing out!"
     exit 1
   fi
 }
@@ -245,14 +248,14 @@ cpufreqqr () {
   THIS_MAXFREQ=$2
   THIS_MINFREQ=$3
   if command_exists cpupower; then
-    sudo cpupower frequency-set --min $MINFREQ --max $MAXFREQ --governor $GOVERNOR
+    sudo cpupower frequency-set --min ${MINFREQ} --max ${MAXFREQ} --governor ${GOVERNOR}
     sudo cpupower frequency-info
   elif command_exists cpufreq-set; then
     CPU_COUNT=$(lscpu -p | grep -E -v '^#' | sort -u -t, -k 2,4 | wc -l)
     count_zero=0
-    while [ $count_zero -lt $CPU_COUNT ]; do
+    while [ ${count_zero} -lt ${CPU_COUNT} ]; do
       count_zero=$((count_zero+1))
-      sudo cpufreq-set -c $count_zero -g $GORVERNOR --max $MAXFREQ --min $MINFREQ
+      sudo cpufreq-set -c ${count_zero} -g ${GORVERNOR} --max ${MAXFREQ} --min ${MINFREQ}
       #sudo cpufreq-set -c $count_zero --max $MAXFREQ
       #sudo cpufreq-set -c $count_zero --min $MINFREQ
       #echo "cpu $i set to performance"
