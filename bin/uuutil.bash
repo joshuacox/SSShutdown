@@ -29,6 +29,7 @@ pacman_clear_cache () {
 }
 
 update_mirrorlist () {
+  set -x
   sudo reflector \
       --threads 8 \
       --delay 1 \
@@ -45,6 +46,7 @@ update_mirrorlist () {
       --fastest 100 \
       --number 100 \
       --latest 100
+  set +x
 }
 
 clear_update_placeholder () {
