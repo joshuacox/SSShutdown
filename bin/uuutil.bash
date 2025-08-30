@@ -265,3 +265,15 @@ cpufreqqr () {
     cpufreq-info
   fi
 }
+
+cleanring () {
+  set -eux
+  killall gpg-agent
+  mv /etc/pacman.d/gnupg /tmp/
+  pacman-key --init
+  pacman-key --populate
+  pacman-key --refresh-key
+  systemctl restart gpg-agent@etc-pacman.d-gnupg.socket 
+  pacman -Sy archlinux-keyring
+  pacman -Su ncdu  
+}
