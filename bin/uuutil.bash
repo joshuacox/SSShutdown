@@ -267,8 +267,8 @@ cpufreqqr () {
 }
 
 cleanring () {
-  set -eux
   killall gpg-agent
+  set -eux
   mv /etc/pacman.d/gnupg /tmp/
   pacman-key --init
   pacman-key --populate
