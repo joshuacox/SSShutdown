@@ -267,13 +267,13 @@ cpufreqqr () {
 }
 
 cleanring () {
-  killall gpg-agent
+  sudo killall gpg-agent
   set -eux
-  mv /etc/pacman.d/gnupg /tmp/
-  pacman-key --init
-  pacman-key --populate
-  pacman-key --refresh-key
-  systemctl restart gpg-agent@etc-pacman.d-gnupg.socket 
-  pacman -Sy archlinux-keyring
-  pacman -Su ncdu  
+  sudo mv -v /etc/pacman.d/gnupg /tmp/
+  sudo pacman-key --init
+  sudo pacman-key --populate
+  sudo pacman-key --refresh-key
+  sudo systemctl restart gpg-agent@etc-pacman.d-gnupg.socket 
+  sudo pacman -Sy archlinux-keyring
+  sudo pacman -Su ncdu  
 }
