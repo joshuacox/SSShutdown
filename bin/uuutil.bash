@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 : ${MIRROR_UPDATE_INTERVAL:=7}
 : ${SYSTEM_UPDATE_INTERVAL:=1}
 : ${SYSTEM_CLEARCACHE_INTERVAL:=30}
