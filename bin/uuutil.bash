@@ -196,7 +196,7 @@ update_nix () {
 try_update () {
   if [ "${NAME}" = "Arch Linux" ]; then
     pacman_update
-  elif [ "${NAME}" = "Ubuntu" ] || [ "${NAME}" = "Debian" ] || [ "${NAME}" = "Linux Mint" ]; then
+  elif [ "${ID}" = "Ubuntu" ] || [ "${ID}" = "Debian" ] || [ "${ID}" = "Linux Mint" ]; then
     apt_update
   elif [ "${NAME}" = "NixOS" ]; then
     nix_update
