@@ -108,8 +108,15 @@ loop_update_pacman () {
       echo "### update marker not found, at $looper loops"
       looper=$((looper+1))
       update_pacman_core
+      update_omarchy
     fi
   done
+}
+
+update_omarchy () {
+  if [ -x ${HOME}/.local/share/omarchy/bin/omarchy-update ]; then
+    omarchy-update -y
+  fi
 }
 
 update_pacman () {
