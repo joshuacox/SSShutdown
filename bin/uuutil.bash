@@ -201,7 +201,7 @@ update_nix () {
 }
 
 try_update () {
-  if [ "${NAME}" = "Arch Linux" ]; then
+  if [ "${NAME}" = "Arch Linux" ] || [ "${ID}" = "omarchy" ] || [ "${ID_LIKE}" = "arch" ] ; then
     pacman_update
   elif [ "${ID}" = "ubuntu" ] || [ "${ID}" = "debian" ] || [ "${ID}" = "Linux Mint" ]; then
     apt_update
