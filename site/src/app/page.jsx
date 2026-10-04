@@ -122,9 +122,14 @@ export default function HomePage() {
                 <td>Refreshes, tests, and sorts fastest regional package mirrors.</td>
               </tr>
               <tr>
-                <td><code>ArchLinuxCleanRing</code></td>
+                <td><code>CleanRing</code></td>
                 <td>Recovery</td>
-                <td>Reinitializes corrupted pacman GPG keyrings with timestamped backups.</td>
+                <td>Universal GPG keyring repair for Arch, Debian/Ubuntu, and Red Hat/Fedora.</td>
+              </tr>
+              <tr>
+                <td><code>ArchLinuxCleanRing</code></td>
+                <td>Alias</td>
+                <td>Backward-compatible alias pointing to <code>CleanRing</code>.</td>
               </tr>
             </tbody>
           </table>
@@ -182,19 +187,19 @@ export default function HomePage() {
         <div className="grid-3">
           <div className="card">
             <h4 className="card-title">Arch & Omarchy</h4>
-            <p>Native <code>pacman</code>, <code>reflector</code>, <code>powerpill</code>, and AUR support.</p>
+            <p>Native <code>pacman</code>, <code>reflector</code>, <code>powerpill</code>, and <code>paccache</code> automated cleaning.</p>
           </div>
           <div className="card">
             <h4 className="card-title">Debian & Ubuntu</h4>
-            <p>Full support for <code>apt-get update && apt-get upgrade</code>.</p>
+            <p>Non-interactive <code>apt-get</code> with dpkg lock checking, automated <code>autoremove</code>, and reboot alerts.</p>
           </div>
           <div className="card">
-            <h4 className="card-title">Fedora & RHEL</h4>
-            <p>Automated <code>dnf upgrade -y</code> integration with cache tracking.</p>
+            <h4 className="card-title">Red Hat & Fedora</h4>
+            <p>Robust <code>dnf</code>/<code>yum</code>/<code>microdnf</code> upgrades, lock checks, RPM key recovery, and <code>needs-restarting</code>.</p>
           </div>
           <div className="card">
             <h4 className="card-title">openSUSE</h4>
-            <p>Reliable <code>zypper -n update</code> operations.</p>
+            <p>Reliable <code>zypper -n update</code> operations with ceremony caching.</p>
           </div>
           <div className="card">
             <h4 className="card-title">NixOS</h4>
@@ -202,7 +207,7 @@ export default function HomePage() {
           </div>
           <div className="card">
             <h4 className="card-title">Lifecycle Hooks</h4>
-            <p>Pre/post execution hooks via <code>/etc/ssshutdown/hooks/in</code> and <code>out</code>.</p>
+            <p>Universal pre/post execution hooks via <code>/etc/ssshutdown/hooks/in</code> and <code>out</code> across all distros.</p>
           </div>
         </div>
       </section>
@@ -267,7 +272,17 @@ export default function HomePage() {
               <tr>
                 <td><code>REFLECTOR_COUNTRY</code></td>
                 <td><code>US</code></td>
-                <td>Country code passed to reflector for mirror filtering.</td>
+                <td>Country code passed to reflector for mirror filtering on Arch.</td>
+              </tr>
+              <tr>
+                <td><code>APT_UPGRADE_TYPE</code></td>
+                <td><code>upgrade</code></td>
+                <td>Debian upgrade mode (<code>upgrade</code> or <code>dist-upgrade</code>).</td>
+              </tr>
+              <tr>
+                <td><code>REDHAT_PKG_MGR</code></td>
+                <td>Auto</td>
+                <td>Override package manager on Red Hat systems (<code>dnf</code>, <code>yum</code>, <code>microdnf</code>).</td>
               </tr>
               <tr>
                 <td><code>SYSTEM_UPDATE_INTERVAL</code></td>
@@ -277,12 +292,12 @@ export default function HomePage() {
               <tr>
                 <td><code>MIRROR_UPDATE_INTERVAL</code></td>
                 <td><code>7</code></td>
-                <td>Days between reflector ranking cycles.</td>
+                <td>Days between mirror ranking cycles.</td>
               </tr>
               <tr>
                 <td><code>SYSTEM_CLEARCACHE_INTERVAL</code></td>
                 <td><code>30</code></td>
-                <td>Days between running paccache cleanup.</td>
+                <td>Days between running cache cleanup (paccache, apt autoremove, dnf clean).</td>
               </tr>
               <tr>
                 <td><code>PACMAN_LOOPER</code></td>

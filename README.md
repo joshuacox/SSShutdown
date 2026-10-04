@@ -12,12 +12,13 @@ Abstract shutdown, reboot, updating, and power management scripts. Getting into 
 * **`hybrid`**: Hybrid sleep (`systemctl hybrid-sleep`).
 
 ### System Updates
-* **`MorningUpdate`**: Unceremoniously clears marker and updates the system packages.
-* **`UpdateOnly`**: Updates the system packages if the update interval has elapsed.
-* **`UUUpdateAndShutdown`**: Updates the system if needed, and safely powers off only if the update succeeded.
-* **`FFForceUpdateAndShutdown`**: Forces an update (clearing the timestamp placeholder) and then shuts down if successful.
-* **`mmmirrorUpdater`**: Refreshes and sorts mirrors using reflector.
-* **`ArchLinuxCleanRing`**: Reinitializes pacman keyring in case of GPG verification issues.
+* **`MorningUpdate`**: Clears update timestamp markers and forces a complete system package upgrade.
+* **`UpdateOnly`**: Updates system packages only if the ceremonial update interval has elapsed.
+* **`UUUpdateAndShutdown`**: Updates system packages if due, and safely powers down only if the update succeeds.
+* **`FFForceUpdateAndShutdown`**: Forces an immediate upgrade and powers down on completion.
+* **`mmmirrorUpdater`**: Refreshes and ranks fastest package mirrors (`reflector` on Arch, `netselect-apt` on Debian, fastestmirror on Red Hat).
+* **`CleanRing`**: Universal keyring repair tool for Arch (pacman-key), Debian/Ubuntu (archive keyrings), and Red Hat (RPM GPG keys).
+* **`ArchLinuxCleanRing`**: Backward-compatible alias for `CleanRing`.
 
 ### CPU & Power Management
 * **`Low`**: Scales CPU down to ~25% max frequency under `powersave` governor.
@@ -27,13 +28,22 @@ Abstract shutdown, reboot, updating, and power management scripts. Getting into 
 
 ## Ceremony
 
-`Ceremony` checks if the machine has been updated within the configured interval (default: 1 day). If updated recently, the package manager step is skipped; otherwise, it runs.
+`Ceremony` checks if the machine has been updated within the configured interval (default: 1 day). If updated recently, the package manager step is skipped; otherwise, it runs. Marker timestamps are tracked per distribution in `/var/cache/` and `/root/.updated`.
 
 ## Supported Distributions
 
 * **Arch Linux / Omarchy / EndeavourOS / Manjaro** (`pacman` / `powerpill` / `reflector`)
-* **Debian / Ubuntu / Linux Mint** (`apt-get`)
-* **Fedora / RHEL / CentOS** (`dnf`)
+  - Automatic `paccache -rk1` cache management.
+  - Multi-threaded reflector ranking.
+* **Debian / Ubuntu / Linux Mint / Pop!_OS** (`apt-get`)
+  - Non-interactive safe upgrades (`DEBIAN_FRONTEND=noninteractive`).
+  - Active lock detection (`/var/lib/dpkg/lock-frontend`, unattended-upgrades).
+  - Periodic `autoremove -y` and `autoclean` cache pruning.
+  - Automatic reboot required detection (`/var/run/reboot-required`).
+* **Red Hat / Fedora / CentOS / Rocky / AlmaLinux / Amazon Linux** (`dnf` / `yum` / `microdnf`)
+  - Automated package manager lock detection.
+  - Automated dependency pruning (`autoremove` and cache cleaning).
+  - Reboot detection via `needs-restarting -r`.
 * **openSUSE / Tumbleweed / Leap** (`zypper`)
 * **NixOS** (`nx`)
 
@@ -42,9 +52,11 @@ Abstract shutdown, reboot, updating, and power management scripts. Getting into 
 The following environment variables can be set to customize behavior:
 
 * `SYSTEM_UPDATE_INTERVAL`: Interval in days between package updates (default: `1`).
-* `MIRROR_UPDATE_INTERVAL`: Interval in days between reflector mirrorlist refreshes (default: `7`).
+* `MIRROR_UPDATE_INTERVAL`: Interval in days between mirrorlist refreshes (default: `7`).
 * `SYSTEM_CLEARCACHE_INTERVAL`: Interval in days between cache cleanings (default: `30`).
-* `REFLECTOR_COUNTRY`: Country code for reflector (default: `US`).
+* `APT_UPGRADE_TYPE`: Debian upgrade type (`upgrade` or `dist-upgrade`, default: `upgrade`).
+* `REDHAT_PKG_MGR`: Package manager override for Red Hat systems (`dnf`, `yum`, or `microdnf`).
+* `REFLECTOR_COUNTRY`: Country code for Arch reflector (default: `US`).
 * `PACMAN_LOOPER`: Retry pacman update loop on failure (default: `true`).
 * `USE_POWERPILL`: Use powerpill instead of pacman (default: `false`).
 * `DEBUG`: Set to `true` to enable verbose shell tracing (`set -x`).
