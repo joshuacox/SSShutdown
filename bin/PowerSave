@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
-. $SCRIPTPATH/uuutil.bash
+. "$SCRIPTPATH/uuutil.bash"
 
-MAXFREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq)
-MINFREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq)
+get_cpu_freq_limits || exit 1
+MAXFREQ="${CPU_MIN_FREQ}"
+MINFREQ="${CPU_MIN_FREQ}"
 GOVERNOR=powersave
 
 powertop_auto_tune
-cpufreqqr $GOVERNOR $MAXFREQ $MINFREQ
+cpufreqqr "$GOVERNOR" "$MAXFREQ" "$MINFREQ"

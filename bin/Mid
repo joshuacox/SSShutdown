@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
-. $SCRIPTPATH/uuutil.bash
-MAXFREQ=$(($(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq)/2))
-MINFREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq)
+. "$SCRIPTPATH/uuutil.bash"
+
+get_cpu_freq_limits || exit 1
+MAXFREQ=$((CPU_MAX_FREQ / 2))
+MINFREQ="${CPU_MIN_FREQ}"
 GOVERNOR=powersave
 
-cpufreqqr $GOVERNOR $MAXFREQ $MINFREQ
+cpufreqqr "$GOVERNOR" "$MAXFREQ" "$MINFREQ"

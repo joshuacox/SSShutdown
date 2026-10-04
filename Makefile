@@ -2,23 +2,30 @@
 ifdef PREFIX
 	PREFIX := $(PREFIX)
 else
-  PREFIX:=/usr/local
+	PREFIX := /usr/local
 endif
-PREFIX_BIN:=${PREFIX}/bin
+PREFIX_BIN := ${PREFIX}/bin
+
+.PHONY: echo install install_all uninstall clean vanity hooks
 
 echo:
-	echo ${PREFIX}
+	@echo ${PREFIX}
 
 install: install_all clean
 
 install_all:
 	./installer
 
+uninstall:
+	@for f in bin/*; do \
+		rm -fv "${PREFIX_BIN}/$$(basename $$f)"; \
+	done
+
 clean:
 	@rm -Rfv build_tmp
 
 vanity:
-	curl -i https://git.io -F "url=https://raw.githubusercontent.com/joshuacox/SSShutdown/master/bootstrap" -F "code=ssshutdown"
+	@echo "git.io has been retired by GitHub. Use the direct raw GitHub URL in README.md."
 
 hooks:
 	sudo mkdir -p /etc/ssshutdown/hooks

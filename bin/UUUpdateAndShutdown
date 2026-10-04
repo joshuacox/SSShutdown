@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
-. $SCRIPTPATH/uuutil.bash
+. "$SCRIPTPATH/uuutil.bash"
 
-try_update
-
-try_shutdown
+if try_update; then
+  try_shutdown
+else
+  echo "Update failed! Aborting shutdown." >&2
+  exit 1
+fi

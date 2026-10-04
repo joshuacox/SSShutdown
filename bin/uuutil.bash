@@ -12,6 +12,7 @@
 # rsync is 404ing on my machine so removing
 #: ${PROTOCOLS:="https,rsync"}
 : ${PROTOCOLS:="https"}
+: ${REFLECTOR_COUNTRY:="US"}
 
 . /etc/os-release
 
@@ -29,11 +30,19 @@ pacman_clear_cache () {
 }
 
 update_mirrorlist () {
+  if ! command_exists reflector; then
+    echo "reflector command not found; skipping mirrorlist update" >&2
+    return 0
+  fi
   set -x
+  local country_args=()
+  if [ -n "${REFLECTOR_COUNTRY}" ]; then
+    country_args=(--country "${REFLECTOR_COUNTRY}")
+  fi
   sudo reflector \
       --threads 8 \
       --delay 1 \
-      --country US \
+      "${country_args[@]}" \
       --ipv4 \
       --verbose \
       --save "${MIRROR_LIST_LOCATION}" \
@@ -55,19 +64,19 @@ clear_update_placeholder () {
 
 phile_czekr () {
   if [ "${DEBUG}" = "true" ]; then
-    printf "If $1 is older than $2 days then run the function $3\n"
+    printf "If %s is older than %s days then run the function %s\n" "$1" "$2" "$3"
   fi
   filename=$1
   file_age_thresh=$(date -d "now - $2 days" +%s)
   function_to_run=$3
-  if [ -f $filename ]; then
+  if [ -f "$filename" ]; then
     file_age=$(sudo date -r "$filename" +%s)
   else
     file_age=$file_age_thresh
   fi
 
   # ...and then just use integer math:
-  if [ $file_age -le $file_age_thresh ]; then
+  if [ "$file_age" -le "$file_age_thresh" ]; then
     $function_to_run
   else
     echo "$filename is up to date"
@@ -75,34 +84,32 @@ phile_czekr () {
 }
 
 replace_mirrorlist () {
-  if ! cmp "${MIRROR_LIST_LOCATION}" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
+  if [ -f "${MIRROR_LIST_LOCATION}" ] && ! cmp "${MIRROR_LIST_LOCATION}" "/etc/pacman.d/mirrorlist" >/dev/null 2>&1
   then
-    #TMP=$(mktemp -d)
-    #sudo rsync --temp-dir /tmp/$TMP -av "$MIRROR_LIST_LOCATION" /etc/pacman.d/mirrorlist
-    #rm -Rf $TMP
     sudo cp -v "${MIRROR_LIST_LOCATION}" "/etc/pacman.d/mirrorlist"
   fi
 }
 
 use_reflector () {
-  if [ ! -f ${MIRROR_LIST_LOCATION} ]; then
+  if [ ! -f "${MIRROR_LIST_LOCATION}" ]; then
     echo 'Mirrorlist cache not found'
     echo 'Using existing one to populate cache'
-    cp -v /etc/pacman.d/mirrorlist "${MIRROR_LIST_LOCATION}" 
+    if [ -f /etc/pacman.d/mirrorlist ]; then
+      cp -v /etc/pacman.d/mirrorlist "${MIRROR_LIST_LOCATION}"
+    fi
   fi
-  phile_czekr "${MIRROR_LIST_LOCATION}" ${MIRROR_UPDATE_INTERVAL} update_mirrorlist
+  phile_czekr "${MIRROR_LIST_LOCATION}" "${MIRROR_UPDATE_INTERVAL}" update_mirrorlist
   replace_mirrorlist
 }
 
 loop_update_pacman () {
   looper=0
   returnCode=1
-  while [ $looper -le 10 ]; do
-    sudo ls -alh "${ROOT_UPDATED_MARKER}"
+  while [ "$looper" -le 10 ]; do
+    sudo ls -alh "${ROOT_UPDATED_MARKER}" >/dev/null 2>&1
     returnCode=$?
-    if [ $returnCode = 0 ]; then
+    if [ $returnCode -eq 0 ]; then
       echo "# BREAK! update marker found, breaking looper at $looper loops"
-      looper=11
       break
     else
       echo "### update marker not found, at $looper loops"
@@ -114,19 +121,19 @@ loop_update_pacman () {
 }
 
 update_omarchy () {
-  if [ -x ${HOME}/.local/share/omarchy/bin/omarchy-update ]; then
+  if [ -x "${HOME}/.local/share/omarchy/bin/omarchy-update" ]; then
     omarchy-update -y
   fi
 }
 
 update_pacman () {
   if [ -f /var/cache/pacman/pkg/cache.lck ]; then
-    echo The pacman cache file exists!
-    echo Check to see if other pacman processes are running.
-    echo If not `rm /var/cache/pacman/pkg/cache.lck` to clear this file.
-    exit 1
+    echo "The pacman cache lock file exists (/var/cache/pacman/pkg/cache.lck)!" >&2
+    echo "Check to see if other pacman processes are running." >&2
+    echo "If not, remove /var/cache/pacman/pkg/cache.lck to clear this file." >&2
+    return 1
   fi
-  if [ ${PACMAN_LOOPER} ]; then
+  if [ "${PACMAN_LOOPER}" = "true" ]; then
     loop_update_pacman
   else
     update_pacman_core
@@ -135,14 +142,14 @@ update_pacman () {
 
 update_pacman_core () {
   returnCode=1
-  if [ USE_POWERPILL = true ]; then
+  if [ "${USE_POWERPILL}" = "true" ]; then
     sudo pacman -Sy --noconfirm
-    if [ -f /usr/bin/powerpill ]; then
+    if [ -x /usr/bin/powerpill ]; then
       sudo powerpill -Su --noconfirm
       returnCode=$?
     else
-      echo 'Error power pill not found!'
-      exit 1
+      echo 'Error: powerpill not found!' >&2
+      return 1
     fi
   else
     sudo pacman -Syu --noconfirm
@@ -153,6 +160,7 @@ update_pacman_core () {
   else
     sudo pacman -Sy --noconfirm ${ONE_RING_TO_RULE_THEM_ALL}
   fi
+  return $returnCode
 }
 
 check_hooks () {
@@ -178,13 +186,30 @@ pacman_update () {
 }
 
 update_apt () {
-  sudo apt-get update
-  sudo apt-get upgrade -y
+  sudo apt-get update && sudo apt-get upgrade -y
   sudo touch "${ROOT_UPDATED_MARKER}"
 }
 
 apt_update () {
   phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_apt
+}
+
+update_dnf () {
+  sudo dnf upgrade -y
+  sudo touch "${ROOT_UPDATED_MARKER}"
+}
+
+dnf_update () {
+  phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_dnf
+}
+
+update_zypper () {
+  sudo zypper -n update
+  sudo touch "${ROOT_UPDATED_MARKER}"
+}
+
+zypper_update () {
+  phile_czekr "${ROOT_UPDATED_MARKER}" "${SYSTEM_UPDATE_INTERVAL}" update_zypper
 }
 
 nix_update () {
@@ -195,21 +220,25 @@ update_nix () {
   if command_exists nx; then
     nx auto -f
   else
-    echo nx is not installed
-    exit 1
+    echo "nx is not installed" >&2
+    return 1
   fi
 }
 
 try_update () {
-  if [ "${NAME}" = "Arch Linux" ] || [ "${ID}" = "omarchy" ] || [ "${ID_LIKE}" = "arch" ] ; then
+  if [ "${NAME}" = "Arch Linux" ] || [ "${ID}" = "omarchy" ] || [ "${ID_LIKE}" = "arch" ]; then
     pacman_update
-  elif [ "${ID}" = "ubuntu" ] || [ "${ID}" = "debian" ] || [ "${ID}" = "Linux Mint" ]; then
+  elif [ "${ID}" = "ubuntu" ] || [ "${ID}" = "debian" ] || [ "${ID}" = "Linux Mint" ] || [ "${ID_LIKE}" = "debian" ]; then
     apt_update
+  elif [ "${ID}" = "fedora" ] || [ "${ID}" = "rhel" ] || [ "${ID}" = "centos" ] || [ "${ID_LIKE}" = "fedora" ] || [ "${ID_LIKE}" = "rhel" ]; then
+    dnf_update
+  elif [ "${ID}" = "opensuse" ] || [ "${ID}" = "opensuse-tumbleweed" ] || [ "${ID}" = "opensuse-leap" ] || [ "${ID_LIKE}" = "suse" ]; then
+    zypper_update
   elif [ "${NAME}" = "NixOS" ]; then
     nix_update
   else
-    echo "unknown os = ${NAME} bailing out!"
-    exit 1
+    echo "unknown os = ${NAME} bailing out!" >&2
+    return 1
   fi
 }
 
@@ -230,11 +259,12 @@ try_suspend () {
 }
 
 try_hibernate () {
-  swapon_count=$(swapon|wc -l)
-  if [ $swapon_count -gt 1 ]; then
+  swapon_count=$(swapon | wc -l)
+  if [ "$swapon_count" -gt 1 ]; then
     systemctl hibernate
   else
-    echo 'No swap cannot hibernate!'; exit 1
+    echo 'No swap found, cannot hibernate!' >&2
+    return 1
   fi
 }
 
@@ -243,7 +273,7 @@ try_hybrid () {
 }
 
 command_exists () {
-  type "$1" &> /dev/null ;
+  type "$1" &> /dev/null
 }
 
 powertop_auto_tune () {
@@ -252,35 +282,55 @@ powertop_auto_tune () {
   fi
 }
 
+get_cpu_freq_limits () {
+  local max_file=""
+  local min_file=""
+  for policy in /sys/devices/system/cpu/cpufreq/policy0 /sys/devices/system/cpu/cpu0/cpufreq; do
+    if [ -f "${policy}/cpuinfo_max_freq" ]; then
+      max_file="${policy}/cpuinfo_max_freq"
+      min_file="${policy}/cpuinfo_min_freq"
+      break
+    fi
+  done
+
+  if [ -z "${max_file}" ] || [ ! -f "${max_file}" ]; then
+    echo "cpufreq policy not found in /sys/devices/system/cpu/." >&2
+    return 1
+  fi
+
+  CPU_MAX_FREQ=$(cat "${max_file}")
+  CPU_MIN_FREQ=$(cat "${min_file}")
+}
+
 cpufreqqr () {
-  THIS_GOVERNOR=$1
-  THIS_MAXFREQ=$2
-  THIS_MINFREQ=$3
+  THIS_GOVERNOR="$1"
+  THIS_MAXFREQ="$2"
+  THIS_MINFREQ="$3"
   if command_exists cpupower; then
-    sudo cpupower frequency-set --min ${MINFREQ} --max ${MAXFREQ} --governor ${GOVERNOR}
+    sudo cpupower frequency-set --min "${THIS_MINFREQ}" --max "${THIS_MAXFREQ}" --governor "${THIS_GOVERNOR}"
     sudo cpupower frequency-info
   elif command_exists cpufreq-set; then
     CPU_COUNT=$(lscpu -p | grep -E -v '^#' | sort -u -t, -k 2,4 | wc -l)
     count_zero=0
-    while [ ${count_zero} -lt ${CPU_COUNT} ]; do
+    while [ "${count_zero}" -lt "${CPU_COUNT}" ]; do
+      sudo cpufreq-set -c "${count_zero}" -g "${THIS_GOVERNOR}" --max "${THIS_MAXFREQ}" --min "${THIS_MINFREQ}"
       count_zero=$((count_zero+1))
-      sudo cpufreq-set -c ${count_zero} -g ${GORVERNOR} --max ${MAXFREQ} --min ${MINFREQ}
-      #sudo cpufreq-set -c $count_zero --max $MAXFREQ
-      #sudo cpufreq-set -c $count_zero --min $MINFREQ
-      #echo "cpu $i set to performance"
     done
     cpufreq-info
+  else
+    echo "Neither cpupower nor cpufreq-set was found on this system." >&2
+    return 1
   fi
 }
 
 cleanring () {
-  sudo killall gpg-agent
+  sudo killall gpg-agent || true
   set -eux
-  sudo mv -v /etc/pacman.d/gnupg /tmp/
+  local backup_dir="/tmp/pacman-gnupg-backup-$(date +%s)"
+  sudo mv -v /etc/pacman.d/gnupg "${backup_dir}"
   sudo pacman-key --init
   sudo pacman-key --populate
   sudo pacman-key --refresh-key
-  sudo systemctl restart gpg-agent@etc-pacman.d-gnupg.socket 
+  sudo systemctl restart gpg-agent@etc-pacman.d-gnupg.socket
   sudo pacman -Sy archlinux-keyring
-  sudo pacman -Su ncdu  
 }
